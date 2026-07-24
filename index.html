@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookmarkd 📚🎬</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-light">
+
+    <nav id="main-nav" class="navbar navbar-expand-lg navbar-dark bg-dark d-none">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#" onclick="showPage('home-page')">Bookmarkd 📚🎬</a>
+            <div class="navbar-nav ms-auto gap-2">
+                <button class="btn btn-outline-light border-0" onclick="showPage('home-page')">Home</button>
+                <button class="btn btn-outline-light border-0" onclick="showPage('journal-page')">My Journal</button>
+                <button class="btn btn-outline-light border-0" onclick="showPage('add-entry-page')">+ Add Entry</button>
+                <button class="btn btn-outline-light border-0" onclick="showPage('find-friends-page')">Find Friends</button>
+                <button class="btn btn-outline-light border-0" onclick="showPage('requests-page')">Requests</button>
+                <button class="btn btn-outline-light border-0" onclick="showPage('profile-page')">Profile</button>
+                <button class="btn btn-danger btn-sm my-auto ms-2" onclick="handleLogout()">Log Out</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container my-5" style="max-width: 700px;">
+
+        <section id="landing-page" class="page">
+            <div class="card p-5 text-center shadow-sm">
+                <h1 class="display-5 fw-bold">Bookmarkd 📚🎬</h1>
+                <p class="lead text-muted">Track what you watch and read, rate your favorites, and discover what your friends enjoy.</p>
+                <div class="d-flex justify-content-center gap-3 mt-3">
+                    <button onclick="showPage('signup-page')" class="btn btn-primary px-4">Sign Up</button>
+                    <button onclick="showPage('login-page')" class="btn btn-outline-secondary px-4">Log In</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="signup-page" class="page d-none">
+            <div class="card p-4 shadow-sm">
+                <h3 class="mb-3">Sign Up</h3>
+                <form onsubmit="handleSignUp(event)">
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" id="signup-username" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="signup-email" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" id="signup-password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Create Account</button>
+                </form>
+                <p class="text-center mt-3 mb-0">Already have an account? <a href="#" onclick="showPage('login-page')">Log In</a></p>
+            </div>
+        </section>
+
+        <section id="login-page" class="page d-none">
+            <div class="card p-4 shadow-sm">
+                <h3 class="mb-3">Log In</h3>
+                <form onsubmit="handleLogin(event)">
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="login-email" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" id="login-password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Log In</button>
+                </form>
+                <p class="text-center mt-3 mb-0">Need an account? <a href="#" onclick="showPage('signup-page')">Sign Up</a></p>
+            </div>
+        </section>
+
+        <section id="home-page" class="page d-none">
+            <h2 class="h4 mb-3">Welcome back!</h2>
+            <h5 class="text-secondary mb-4">Your Feed</h5>
+            <div id="friends-feed-list"></div>
+        </section>
+
+        <section id="journal-page" class="page d-none">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2>My Journal</h2>
+                <button onclick="showPage('add-entry-page')" class="btn btn-primary btn-sm">+ Add New Entry</button>
+            </div>
+            <div class="btn-group mb-4" role="group">
+                <button class="btn btn-outline-primary active" onclick="filterJournal('All', event)">All</button>
+                <button class="btn btn-outline-primary" onclick="filterJournal('Movie', event)">Movies</button>
+                <button class="btn btn-outline-primary" onclick="filterJournal('Book', event)">Books</button>
+            </div>
+            <div id="journal-list"></div>
+        </section>
+
+        <section id="add-entry-page" class="page d-none">
+            <div class="card p-4 shadow-sm">
+                <h3 class="mb-3">Add Entry</h3>
+                <form onsubmit="handleAddEntry(event)">
+                    <div class="mb-3">
+                        <label class="form-label">Title</label>
+                        <input type="text" id="entry-title" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Type</label>
+                        <div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="entry-type" id="type-movie" value="Movie" checked>
+                                <label class="form-check-label" for="type-movie">Movie</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="entry-type" id="type-book" value="Book">
+                                <label class="form-check-label" for="type-book">Book</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select id="entry-status" class="form-select">
+                            <option value="Want to Read/Watch">Want to Read/Watch</option>
+                            <option value="Currently Reading/Watching">Currently Reading/Watching</option>
+                            <option value="Finished">Finished</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rating</label>
+                        <select id="entry-rating" class="form-select">
+                            <option value="1">1 Star ★☆☆☆☆</option>
+                            <option value="2">2 Stars ★★☆☆☆</option>
+                            <option value="3">3 Stars ★★★☆☆</option>
+                            <option value="4">4 Stars ★★★★☆</option>
+                            <option value="5" selected>5 Stars ★★★★★</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Review</label>
+                        <textarea id="entry-review" class="form-control" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Save Entry</button>
+                </form>
+            </div>
+        </section>
+
+        <section id="find-friends-page" class="page d-none">
+            <h3 class="mb-3">Find Friends</h3>
+            <div class="input-group mb-4">
+                <input type="text" id="search-username" class="form-control" placeholder="Search by username...">
+                <button onclick="searchFriends()" class="btn btn-primary">Search</button>
+            </div>
+            <div id="search-results"></div>
+        </section>
+
+        <section id="requests-page" class="page d-none">
+            <h3 class="mb-3">Friend Requests</h3>
+            <h5>Received</h5>
+            <div id="received-requests-list" class="mb-4"></div>
+            <h5>Sent</h5>
+            <div id="sent-requests-list"></div>
+        </section>
+
+        <section id="profile-page" class="page d-none">
+            <div class="card p-4 shadow-sm text-center mb-4">
+                <h2 id="profile-username">@username</h2>
+                <p id="profile-bio" class="text-muted">No bio added yet.</p>
+                <div class="d-flex justify-content-center gap-4 text-secondary">
+                    <span id="profile-movies-count">0 Movies</span>
+                    <span id="profile-books-count">0 Books</span>
+                </div>
+            </div>
+            <h4>Recent Activity</h4>
+            <div id="profile-recent-entries"></div>
+        </section>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
